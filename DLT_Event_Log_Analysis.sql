@@ -122,8 +122,3 @@ FROM(
 -- MAGIC     output_records,
 -- MAGIC     timestamp 
 -- MAGIC     FROM expectations""").write.mode("overwrite").saveAsTable(f"{db}.dlt_expectations")
-
--- COMMAND ----------
-
--- MAGIC %md
--- MAGIC <a href="https://e2-demo-field-eng.cloud.databricks.com/sql/dashboards/30e34351-16d4-4062-8a99-9d52043c11f5-craig-lukasik-dlt-stats?o=1444828305810485" target="_blank">Data Quality Dashboard</a>
