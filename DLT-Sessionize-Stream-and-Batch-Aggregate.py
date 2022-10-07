@@ -217,22 +217,23 @@ if stream_and_aggregate or only_aggregate:
          inner join LIVE.max_session_end b
          where a.session_end_date between b.start_at and b.yesterday
       )
-      select e.session_end_date, 
+      select max(e.session_end_date) max_session_end_date, 
              e.{col_media_id},
              m.{col_media_name},
              count(distinct e.{col_profile_id}) unique_profiles, 
              e.start_at as start_date, 
              e.yesterday as end_date,
              {lookback_days} as lookback_days,
-             {yesterday_days} as yesterday_days
+             {yesterday_days} as yesterday_days,
+             current_timestamp as agg_timestamp
         from exploded e
         join LIVE.static_media_names m on e.media_id = m.media_id
        group by
-             e.session_end_date, 
              e.{col_media_id}, 
              m.{col_media_name},
              start_at,
-             yesterday       
+             yesterday,
+             current_timestamp
      """)
 
     return df 
