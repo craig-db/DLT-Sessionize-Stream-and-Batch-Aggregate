@@ -8,12 +8,16 @@
 # MAGIC One continously streaming and sessionizing incoming events. Another that can be scheduled to run daily to compute aggregates.
 # MAGIC 
 # MAGIC Make note of the pipeline IDs as you will want to use that with the DLT_Event_Log_Analysis (if you wish to build Data Quality related dashboards)
+# MAGIC 
+# MAGIC Note: There's an optional DLT pipeline you can install that will capture the history of the aggregate table
 
 # COMMAND ----------
 
-# DBTITLE 1,Adjust this value to avoid conflicts. It will be the Pipeline that you see in "Workflows"->"Delta Live Tables"
+# DBTITLE 1,Adjust these values to avoid conflicts. You will see these in "Workflows"->"Delta Live Tables"
 CONTINUOUS_PIPELINE_NAME = "CraigLukasikDLT_STREAMING"
 BATCH_PIPELINE_NAME = "CraigLukasikDLT_BATCH"
+HISTORY_PIPELINE_NAME = "CraigLukasikDLT_HISTORY"
+
 TARGET_SCHEMA = "craig_lukasik_dlt_demo"
 
 # COMMAND ----------
@@ -76,6 +80,43 @@ retval = pipeline_service.create(
   configuration = {
       "stream_and_aggregate": "false",
       "only_aggregate": "true"
+  }  
+)
+
+# COMMAND ----------
+
+print(retval)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Optional: Create a table that shows the history of the aggregate table.
+# MAGIC Run the following cells if you want to install a DLT pipeline to create a table that will capture the change history of the aggregate table
+
+# COMMAND ----------
+
+history_nb_path = (
+  dbutils.entry_point.getDbutils().notebook().getContext()
+    .notebookPath().getOrElse(None)
+    .replace("Install_DLT_Pipeline", "DLT-Capture-Gold-Changes")
+)
+
+# COMMAND ----------
+
+retval = pipeline_service.create(
+  name=HISTORY_PIPELINE_NAME, 
+  target=TARGET_SCHEMA,
+  development=True, 
+  continuous=False, 
+  libraries=[
+    {
+      "notebook": {
+        "path": history_nb_path
+      }
+    }
+  ],
+  configuration = {
+      "target": TARGET_SCHEMA
   }  
 )
 

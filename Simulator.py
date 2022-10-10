@@ -8,9 +8,11 @@ schema = "craig_lukasik_dlt_demo"
 
 event_schema = "timestamp timestamp, account_id string, profile_id string, media_id string, event_type string, ingest_date date"
 
-run_duration_minutes = 20
-
 sleep_between_drops_seconds = 10
+
+start_date = "2021-01-01"
+
+end_date = "2022-10-01"
 
 # COMMAND ----------
 
@@ -33,8 +35,7 @@ dbutils.fs.rm(simulation_dir, True)
 
 # COMMAND ----------
 
-movie_names = """
-The 400 Blows (1959)
+movie_names = """The 400 Blows (1959)
 All Quiet on the Western Front (1930)
 Wet Hot American Summer (2001)
 Duck Soup (1933)
@@ -133,8 +134,7 @@ Four Lions (2010)
 3:10 to Yuma (2007)
 The Bourne Supremacy (2004)
 Ghostbusters (1984)
-Groundhog Day (1993)
-"""
+Groundhog Day (1993)"""
 
 # COMMAND ----------
 
@@ -204,9 +204,6 @@ def write_events(dy, pdf):
 
 # COMMAND ----------
 
-start_date = "2021-01-01"
-end_date = "2022-10-01"
-
 start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
 end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
 
@@ -217,17 +214,4 @@ while (cur_date_obj < end_date_obj):
   pdf = generate_events(cur_date_obj)
   write_events(cur_date_obj, pdf)
   cur_date_obj += timedelta(days=1)
-  time.sleep(10)
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-# dbutils.fs.rm("dbfs:/pipelines/1b98baa4-85f3-4358-a102-1ffa94d249e3/checkpoints", True)
-# dbutils.fs.rm("dbfs:/pipelines/1b98baa4-85f3-4358-a102-1ffa94d249e3/tables", True)
-
-# COMMAND ----------
-
-
+  time.sleep(sleep_between_drops_seconds)
